@@ -50,10 +50,34 @@ public class RegisterActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =new Intent(RegisterActivity.this,OTPVerificationActivity.class);
-                intent.putExtra("phone",mobile.getText().toString());
-                intent.putExtra("profile_image",image);
-                startActivity(intent);
+                // Get values from EditText fields
+                String usernameValue = userName.getText().toString();
+                String mobileValue = mobile.getText().toString();
+                String passwordValue = password.getText().toString();
+                String confirmPasswordValue = confirm_password.getText().toString();
+                String emailValue = email.getText().toString();
+
+                // Check if any mandatory field is empty
+                if (usernameValue.isEmpty() || mobileValue.isEmpty() || passwordValue.isEmpty() || confirmPasswordValue.isEmpty() || image == null) {
+                    // Display an error message if any mandatory field is empty
+                    Toast.makeText(RegisterActivity.this, "All fields are required except email", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Check if passwords match
+                    if (!passwordValue.equals(confirmPasswordValue)) {
+                        // Display an error message if passwords do not match
+                        Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Proceed with registration
+                        Intent intent = new Intent(RegisterActivity.this, OTPVerificationActivity.class);
+                        intent.putExtra("username", usernameValue);
+                        intent.putExtra("phone", mobileValue);
+                        intent.putExtra("email", emailValue);
+                        intent.putExtra("password", passwordValue);
+                        intent.putExtra("confirm_password", confirmPasswordValue);
+                        intent.putExtra("profile_image", image);
+                        startActivity(intent);
+                    }
+                }
             }
         });
 
