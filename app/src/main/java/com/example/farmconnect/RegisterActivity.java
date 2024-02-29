@@ -21,15 +21,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.farmconnect.utils.AndroidUtil;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CAMERA_PERMISSION = 2;
     private static final int REQUEST_IMAGE_CAPTURE = 3;
 
-    ImageView profie_image;
+    ImageView profileImage;
     Uri image;
-    EditText userName,mobile,email,password,confirm_password;
+    EditText userName, mobile, email, password, confirmPassword;
     Button registerButton;
     TextView login;
 
@@ -38,45 +40,33 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        profie_image=findViewById(R.id.profile_image);
-        userName=findViewById(R.id.username);
-        mobile=findViewById(R.id.phone);
-        email=findViewById(R.id.email);
-        password=findViewById(R.id.password);
-        confirm_password=findViewById(R.id.confirm_password);
-        registerButton=findViewById(R.id.RegisterButton);
-        login=findViewById(R.id.LoginText);
+        profileImage = findViewById(R.id.profile_image);
+        userName = findViewById(R.id.username);
+        mobile = findViewById(R.id.phone);
+        email = findViewById(R.id.email);
+        password = findViewById(R.id.password);
+        confirmPassword = findViewById(R.id.confirm_password);
+        registerButton = findViewById(R.id.RegisterButton);
+        login = findViewById(R.id.LoginText);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Get values from EditText fields
                 String usernameValue = userName.getText().toString();
                 String mobileValue = mobile.getText().toString();
                 String passwordValue = password.getText().toString();
-                String confirmPasswordValue = confirm_password.getText().toString();
+                String confirmPasswordValue = confirmPassword.getText().toString();
                 String emailValue = email.getText().toString();
 
-                // Check if any mandatory field is empty
-                if (usernameValue.isEmpty() || mobileValue.isEmpty() || passwordValue.isEmpty() || confirmPasswordValue.isEmpty() || image == null) {
-                    // Display an error message if any mandatory field is empty
-                    Toast.makeText(RegisterActivity.this, "All fields are required except email", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Check if passwords match
-                    if (!passwordValue.equals(confirmPasswordValue)) {
-                        // Display an error message if passwords do not match
-                        Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Proceed with registration
-                        Intent intent = new Intent(RegisterActivity.this, OTPVerificationActivity.class);
-                        intent.putExtra("username", usernameValue);
-                        intent.putExtra("phone", mobileValue);
-                        intent.putExtra("email", emailValue);
-                        intent.putExtra("password", passwordValue);
-                        intent.putExtra("confirm_password", confirmPasswordValue);
-                        intent.putExtra("profile_image", image);
-                        startActivity(intent);
-                    }
+                if (validateFields(usernameValue, mobileValue, passwordValue, confirmPasswordValue, emailValue)) {
+                    Intent intent = new Intent(RegisterActivity.this, OTPVerificationActivity.class);
+                    intent.putExtra("username", usernameValue);
+                    intent.putExtra("phone", mobileValue);
+                    intent.putExtra("email", emailValue);
+                    intent.putExtra("password", passwordValue);
+                    intent.putExtra("confirm_password", confirmPasswordValue);
+                    intent.putExtra("profile_image", image);
+                    startActivity(intent);
                 }
             }
         });
@@ -84,59 +74,72 @@ public class RegisterActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =new Intent(RegisterActivity.this,LoginActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
     }
 
-    // Method called when the user clicks on the ImageView
+    private boolean validateFields(String username, String mobile, String password, String confirmPassword, String email) {
+        if (username.isEmpty() || mobile.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || image == null) {
+            AndroidUtil.showToast(getApplicationContext(), "All fields are required except email");
+            return false;
+        }
+
+        if (password.length() < 8) {
+            AndroidUtil.showToast(getApplicationContext(), "Password must be at least 8 characters");
+            return false;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            AndroidUtil.showToast(getApplicationContext(), "Passwords do not match");
+            return false;
+        }
+
+        if (!email.isEmpty() && !AndroidUtil.isValidEmail(email)) {
+            AndroidUtil.showToast(getApplicationContext(), "Please enter a valid email address");
+            return false;
+        }
+
+        return true;
+    }
+
     public void selectImage(View view) {
-        // Check for camera and storage permissions
         if (checkCameraPermission()) {
-            // If permissions are granted, show the image selection dialog
             showImageSelectionDialog();
         } else {
-            // If permissions are not granted, request them
             requestCameraPermission();
         }
     }
-    // Check if camera and storage permissions are granted
+
     private boolean checkCameraPermission() {
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) ==
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                         PackageManager.PERMISSION_GRANTED;
     }
 
-    // Request camera and storage permissions
     private void requestCameraPermission() {
         ActivityCompat.requestPermissions(this,
-                new String[]{android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 REQUEST_CAMERA_PERMISSION);
     }
 
-    // Handle the result after requesting permissions
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                     grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                // If permissions are granted, show the image selection dialog
                 showImageSelectionDialog();
             } else {
-                // If permissions are not granted, show a message to the user
-                Toast.makeText(this, "Camera and storage permissions are required", Toast.LENGTH_SHORT).show();
+                AndroidUtil.showToast(getApplicationContext(), "Camera and storage permissions are required");
             }
         }
     }
 
-    // Show a dialog to let the user choose between camera and gallery
     private void showImageSelectionDialog() {
-        // You can use a library or create a custom dialog for a better user experience
-        // For simplicity, using a basic AlertDialog here
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Image")
                 .setItems(new CharSequence[]{"Take Photo", "Choose from Gallery"}, new DialogInterface.OnClickListener() {
@@ -144,11 +147,9 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                // Take Photo
                                 dispatchTakePictureIntent();
                                 break;
                             case 1:
-                                // Choose from Gallery
                                 openGallery();
                                 break;
                         }
@@ -156,13 +157,12 @@ public class RegisterActivity extends AppCompatActivity {
                 })
                 .show();
     }
-    // Method to open the gallery
+
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST);
     }
 
-    // Method to dispatch the camera intent
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -170,7 +170,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    // Handle the result after selecting an image from the gallery or taking a picture
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -178,29 +177,23 @@ public class RegisterActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case PICK_IMAGE_REQUEST:
-                    // Image selected from gallery
                     handleImageSelection(data.getData());
                     break;
                 case REQUEST_IMAGE_CAPTURE:
-                    // Image captured from camera
                     handleImageCapture(data);
                     break;
             }
         }
     }
 
-    // Handle image selected from gallery
     private void handleImageSelection(Uri selectedImageUri) {
-        ImageView imageView = findViewById(R.id.profile_image);
-        imageView.setImageURI(selectedImageUri);
-        image=selectedImageUri;
+        profileImage.setImageURI(selectedImageUri);
+        image = selectedImageUri;
     }
 
-    // Handle image captured from camera
     private void handleImageCapture(Intent data) {
         Bundle extras = data.getExtras();
         Bitmap imageBitmap = (Bitmap) extras.get("data");
-        ImageView imageView = findViewById(R.id.profile_image);
-        imageView.setImageBitmap(imageBitmap);
+        profileImage.setImageBitmap(imageBitmap);
     }
 }
