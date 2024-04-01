@@ -194,5 +194,8 @@ public class RegisterActivity extends AppCompatActivity {
         Bundle extras = data.getExtras();
         Bitmap imageBitmap = (Bitmap) extras.get("data");
         profileImage.setImageBitmap(imageBitmap);
+
+        // Convert bitmap to URI and set it to image
+        image = AndroidUtil.getImageUri(getApplicationContext(), imageBitmap);
     }
 }
