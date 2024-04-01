@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -58,14 +59,12 @@ public class RegisterActivity extends AppCompatActivity {
                 String confirmPasswordValue = confirmPassword.getText().toString();
                 String emailValue = email.getText().toString();
 
+                // Inside your onClick method for registerButton
                 if (validateFields(usernameValue, mobileValue, passwordValue, confirmPasswordValue, emailValue)) {
+                    UserModel user = new UserModel(usernameValue, mobileValue, emailValue, passwordValue, image);
                     Intent intent = new Intent(RegisterActivity.this, OTPVerificationActivity.class);
-                    intent.putExtra("username", usernameValue);
-                    intent.putExtra("phone", mobileValue);
-                    intent.putExtra("email", emailValue);
-                    intent.putExtra("password", passwordValue);
-                    intent.putExtra("confirm_password", confirmPasswordValue);
-                    intent.putExtra("profile_image", image);
+                    // Pass the UserModel instance to the next activity
+                    intent.putExtra("user", user);
                     startActivity(intent);
                 }
             }
