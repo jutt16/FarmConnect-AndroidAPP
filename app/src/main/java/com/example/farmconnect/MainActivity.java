@@ -2,6 +2,7 @@ package com.example.farmconnect;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -13,6 +14,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,12 +23,15 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.farmconnect.Adapters.ViewPagerMessengerAdapter;
+import com.example.farmconnect.utils.AndroidUtil;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONArray;
@@ -47,8 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     TabLayout tabLayout;
     ViewPager viewPager;
-    TextView weatherTextView;
-    ImageView weatherIconImageView;
+    MenuItem weather,weatherIcon;
     private LocationManager locationManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
         // Initializing Elements
         tabLayout = findViewById(R.id.tab_layout);
         viewPager = findViewById(R.id.view_pager);
-        weatherTextView = findViewById(R.id.weather_textview);
-        weatherIconImageView = findViewById(R.id.weather_imageview);
+
+        //Toolbar Setup
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // Initialize location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -106,6 +113,32 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    //Toolbar methods
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        // Get the weather menu item
+        weather = menu.findItem(R.id.weather);
+        weatherIcon = menu.findItem(R.id.weather_icon);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.profile) {
+            //goto profile
+            AndroidUtil.showToast(getApplicationContext(),"Your Profile");
+        } else if(id == R.id.search) {
+            //goto search option
+            AndroidUtil.showToast(getApplicationContext(),"Search Option");
+        } else if (id == R.id.settings) {
+            //goto settings
+            AndroidUtil.showToast(getApplicationContext(),"Settings Option");
+        }
+        return true;
     }
 
     // Method to update icon colors when a tab is selected
@@ -214,7 +247,8 @@ public class MainActivity extends AppCompatActivity {
                     String description = weatherObject.getString("description");
                     String iconCode = weatherObject.getString("icon");
 
-                    weatherTextView.setText(description+", " + temperature+" Kelvin"+" in "+location);
+                    weather.setTitle(temperature+" K");
+                    weather.setTooltipText(description+", " + temperature+" Kelvin"+" in "+location);
 
                     // Load weather icon
                     String iconUrl = "https://openweathermap.org/img/w/" + iconCode + ".png";
@@ -246,7 +280,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
             if (bitmap != null) {
-                weatherIconImageView.setImageBitmap(bitmap);
+                // Convert Bitmap to Drawable
+                Drawable iconDrawable = new BitmapDrawable(getResources(), bitmap);
+                weatherIcon.setIcon(iconDrawable);
             }
         }
     }
