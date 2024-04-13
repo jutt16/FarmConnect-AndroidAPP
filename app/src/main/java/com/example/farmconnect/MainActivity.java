@@ -9,6 +9,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +23,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -131,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
         if(id == R.id.profile) {
             //goto profile
             AndroidUtil.showToast(getApplicationContext(),"Your Profile");
+            Intent intent = new Intent(getApplicationContext(),ProfileActivity.class);
+            startActivity(intent);
         } else if(id == R.id.search) {
             //goto search option
             AndroidUtil.showToast(getApplicationContext(),"Search Option");
@@ -248,7 +252,9 @@ public class MainActivity extends AppCompatActivity {
                     String iconCode = weatherObject.getString("icon");
 
                     weather.setTitle(temperature+" K");
-                    weather.setTooltipText(description+", " + temperature+" Kelvin"+" in "+location);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        weather.setTooltipText(description+", " + temperature+" Kelvin"+" in "+location);
+                    }
 
                     // Load weather icon
                     String iconUrl = "https://openweathermap.org/img/w/" + iconCode + ".png";
