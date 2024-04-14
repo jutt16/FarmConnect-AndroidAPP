@@ -13,14 +13,17 @@ import android.widget.TextView;
 
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -52,6 +55,8 @@ public class OTPVerificationActivity extends AppCompatActivity {
         resendOTPTextView = findViewById(R.id.ResendOTPText);
 
         userModel = getIntent().getParcelableExtra("user");
+        userModel.setUserId(FirebaseUtil.currentUserId());
+        userModel.setCreatedTimestamp(Timestamp.now());
         phoneNumber = userModel.getMobile();
         sendOtp(phoneNumber, false);
 
@@ -133,21 +138,81 @@ public class OTPVerificationActivity extends AppCompatActivity {
     }
 
     void register(PhoneAuthCredential phoneAuthCredential, UserModel userModel) {
-        //register and go to next activity
+        // Register and go to the next activity
         setInProgress(true);
         mAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 setInProgress(false);
                 if (task.isSuccessful()) {
-                    Intent intent = new Intent(OTPVerificationActivity.this, LoginActivity.class);
-                    intent.putExtra("user", userModel);
-                    AndroidUtil.showToast(getApplicationContext(), "OTP verified successfully");
-                    startActivity(intent);
+                    // Fetch existing user data
+                    FirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    // Document exists, update the data
+                                    updateUserDocument(document, userModel);
+                                } else {
+                                    // Document doesn't exist, create it
+                                    createNewUserDocument(userModel);
+                                }
+                            } else {
+                                AndroidUtil.showToast(getApplicationContext(), "Failed to retrieve user data: " + task.getException().getMessage());
+                            }
+                        }
+                    });
                 } else {
-                    AndroidUtil.showToast(getApplicationContext(), "OTP verification Failed");
+                    AndroidUtil.showToast(getApplicationContext(), "OTP verification failed");
                 }
             }
         });
     }
+
+    private void createNewUserDocument(UserModel userModel) {
+        setInProgress(true);
+        // Set timestamp and user ID
+        userModel.setCreatedTimestamp(Timestamp.now());
+        userModel.setUserId(FirebaseUtil.currentUserId());
+
+        FirebaseUtil.currentUserDetails().set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                setInProgress(false);
+                if (task.isSuccessful()) {
+                    proceedToNextActivity(userModel);
+                } else {
+                    AndroidUtil.showToast(getApplicationContext(), "Failed to create user document: " + task.getException().getMessage());
+                }
+            }
+        });
+    }
+
+    private void updateUserDocument(DocumentSnapshot document, UserModel userModel) {
+        setInProgress(true);
+        // Set timestamp and user ID
+        userModel.setCreatedTimestamp(Timestamp.now());
+        userModel.setUserId(FirebaseUtil.currentUserId());
+
+        document.getReference().set(userModel).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                setInProgress(false);
+                if (task.isSuccessful()) {
+                    proceedToNextActivity(userModel);
+                } else {
+                    AndroidUtil.showToast(getApplicationContext(), "Failed to update user document: " + task.getException().getMessage());
+                }
+            }
+        });
+    }
+
+    private void proceedToNextActivity(UserModel userModel) {
+        Intent intent = new Intent(OTPVerificationActivity.this, LoginActivity.class);
+        intent.putExtra("user", userModel);
+        AndroidUtil.showToast(getApplicationContext(), "OTP verified successfully");
+        startActivity(intent);
+    }
+
 }

@@ -4,12 +4,52 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.Timestamp;
+
 public class UserModel implements Parcelable {
     private String userName;
     private String mobile;
     private String email;
+    private Timestamp createdTimestamp;
+    private String userId;
+    private String fcmToken;
     private String password;
     private Uri profileImageUri;
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public UserModel(String userName, String mobile, String email, Timestamp createdTimestamp, String userId, String password, Uri profileImageUri) {
+        this.userName = userName;
+        this.mobile = mobile;
+        this.email = email;
+        this.createdTimestamp = createdTimestamp;
+        this.userId = userId;
+        this.fcmToken = fcmToken;
+        this.password = password;
+        this.profileImageUri = profileImageUri;
+    }
 
     public UserModel(String userName, String mobile, String email, String password, Uri profileImageUri) {
         this.userName = userName;
