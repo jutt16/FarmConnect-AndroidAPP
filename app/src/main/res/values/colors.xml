@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="off_white">#FAFAFA</color>
     <color name="agri_1">#2A8809</color>
     <color name="agri">#2E9F06</color>
     <color name="grey">#AEB0B3</color>

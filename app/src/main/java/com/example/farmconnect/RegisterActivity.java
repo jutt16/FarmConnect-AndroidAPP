@@ -23,6 +23,9 @@ import android.widget.Toast;
 
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.ImageManager;
+
+import java.io.IOException;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -31,7 +34,6 @@ public class RegisterActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 3;
 
     ImageView profileImage;
-    Uri image;
     EditText userName, mobile, email, password, confirmPassword;
     Button registerButton;
     TextView login;
@@ -61,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 // Inside your onClick method for registerButton
                 if (validateFields(usernameValue, mobileValue, passwordValue, confirmPasswordValue, emailValue)) {
-                    UserModel user = new UserModel(usernameValue, mobileValue, emailValue, passwordValue, image);
+                    UserModel user = new UserModel(usernameValue, mobileValue, emailValue, passwordValue);
                     Intent intent = new Intent(RegisterActivity.this, OTPVerificationActivity.class);
                     // Pass the UserModel instance to the next activity
                     intent.putExtra("user", user);
@@ -81,7 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean validateFields(String username, String mobile, String password, String confirmPassword, String email) {
-        if (username.isEmpty() || mobile.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || image == null) {
+        if (username.isEmpty() || mobile.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || ImageManager.getInstance().getImageBitmap() == null) {
             AndroidUtil.showToast(getApplicationContext(), "All fields are required except email");
             return false;
         }
@@ -176,7 +178,7 @@ public class RegisterActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case PICK_IMAGE_REQUEST:
-                    handleImageSelection(data.getData());
+                    handleImageSelection(data);
                     break;
                 case REQUEST_IMAGE_CAPTURE:
                     handleImageCapture(data);
@@ -185,9 +187,18 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
-    private void handleImageSelection(Uri selectedImageUri) {
-        profileImage.setImageURI(selectedImageUri);
-        image = selectedImageUri;
+    private void handleImageSelection(Intent data) {
+        Uri selectedImageUri = data.getData();
+        try {
+            Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+            profileImage.setImageBitmap(imageBitmap);
+
+            // Set the bitmap in the singleton
+            ImageManager.getInstance().setImageBitmap(imageBitmap);
+        } catch (IOException e) {
+            AndroidUtil.showToast(getApplicationContext(),e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void handleImageCapture(Intent data) {
@@ -195,7 +206,7 @@ public class RegisterActivity extends AppCompatActivity {
         Bitmap imageBitmap = (Bitmap) extras.get("data");
         profileImage.setImageBitmap(imageBitmap);
 
-        // Convert bitmap to URI and set it to image
-        image = AndroidUtil.getImageUri(getApplicationContext(), imageBitmap);
+        // Set the bitmap in the singleton
+        ImageManager.getInstance().setImageBitmap(imageBitmap);
     }
 }

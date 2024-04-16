@@ -137,7 +137,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else if(id == R.id.search) {
             //goto search option
-            AndroidUtil.showToast(getApplicationContext(),"Search Option");
+            AndroidUtil.showToast(getApplicationContext(),"Search Users");
+            Intent intent = new Intent(getApplicationContext(),SearchUserActivity.class);
+            startActivity(intent);
         } else if (id == R.id.settings) {
             //goto settings
             AndroidUtil.showToast(getApplicationContext(),"Settings Option");

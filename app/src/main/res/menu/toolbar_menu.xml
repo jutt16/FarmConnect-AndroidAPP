@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Weather Icon"
+        android:id="@+id/weather_icon"
+        app:showAsAction="ifRoom" />
+    <item
+        android:title="Weather"
+        android:id="@+id/weather"
+        app:showAsAction="ifRoom" />
+    <item
+        android:title="Profile"
+        android:id="@+id/profile" />
+    <item
+        android:id="@+id/search"
+        android:title="Search"
+        android:icon="@drawable/baseline_search_24"
+        app:showAsAction="ifRoom|collapseActionView" />
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        android:icon="@drawable/baseline_settings_24" />
+
+
+</menu>

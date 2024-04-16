@@ -47,4 +47,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // FirebaseUI for Cloud Firestore
+    implementation("com.firebaseui:firebase-ui-firestore:8.0.2")
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +14,9 @@ import android.widget.TextView;
 
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.FileUtils;
 import com.example.farmconnect.utils.FirebaseUtil;
+import com.example.farmconnect.utils.ImageManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -25,9 +28,20 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class OTPVerificationActivity extends AppCompatActivity {
 
@@ -181,6 +195,7 @@ public class OTPVerificationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 setInProgress(false);
                 if (task.isSuccessful()) {
+                    registerAPI(userModel);
                     proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to create user document: " + task.getException().getMessage());
@@ -200,6 +215,7 @@ public class OTPVerificationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 setInProgress(false);
                 if (task.isSuccessful()) {
+                    registerAPI(userModel);
                     proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to update user document: " + task.getException().getMessage());
@@ -213,6 +229,62 @@ public class OTPVerificationActivity extends AppCompatActivity {
         intent.putExtra("user", userModel);
         AndroidUtil.showToast(getApplicationContext(), "OTP verified successfully");
         startActivity(intent);
+    }
+
+    private void registerAPI(UserModel userModel) {
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+        // Convert the Bitmap to a File
+        File imageFile = FileUtils.createImageFileFromBitmap(getApplicationContext(), ImageManager.getInstance().getImageBitmap());
+        if (imageFile == null) {
+            // Handle error creating file
+            return;
+        }
+
+        // Prepare the request body
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("profile_image", imageFile.getName(),
+                        RequestBody.create(MediaType.parse("application/octet-stream"), imageFile))
+                .addFormDataPart("user_id", userModel.getUserId())
+                .addFormDataPart("name", userModel.getUserName())
+                .addFormDataPart("role", "android_user")
+                .addFormDataPart("status", "1")
+                .addFormDataPart("mobile", userModel.getMobile())
+                .addFormDataPart("password", userModel.getPassword())
+                .addFormDataPart("email", userModel.getEmail())
+                .addFormDataPart("password_confirmation", userModel.getPassword())
+                .build();
+
+        // Prepare the request
+        Request request = new Request.Builder()
+                .url(getApplicationContext().getResources().getString(R.string.api_base_url) + ":8000/api/user/store")
+                .method("POST", body)
+                .build();
+
+        // Send the request asynchronously
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Check if the response is successful (status code 200)
+                if (response.isSuccessful()) {
+                    // Handle success response
+                    String responseBody = response.body().string();
+                    Log.d("Success: ", responseBody);
+                } else {
+                    // Handle failure response
+                    String responseBody = response.body().string();
+                    Log.d("Failure1: ", responseBody);
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle failure to connect to the server
+                e.printStackTrace();
+                Log.d("Failure2:", e.getMessage());
+                AndroidUtil.showToast(getApplicationContext(), "Failure: " + e.getMessage());
+            }
+        });
     }
 
 }
