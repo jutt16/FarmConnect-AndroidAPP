@@ -25,6 +25,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +35,9 @@ import android.widget.Toast;
 
 import com.example.farmconnect.Adapters.ViewPagerMessengerAdapter;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.FirebaseUtil;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -115,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        getFCMtoken();
     }
 
     //Toolbar methods
@@ -293,6 +298,17 @@ public class MainActivity extends AppCompatActivity {
                 weatherIcon.setIcon(iconDrawable);
             }
         }
+    }
+
+    void getFCMtoken(){
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful()){
+                String token = task.getResult();
+                FirebaseUtil.currentUserDetails().update("fcmToken",token);
+//                Log.d("Token",token);
+//                AndroidUtil.showToast(getApplicationContext(),token);
+            }
+        });
     }
 
 }

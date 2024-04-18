@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
 import com.example.farmconnect.utils.ImageManager;
@@ -187,16 +189,21 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+    // Assuming profileImage is the reference to your ImageView
     private void handleImageSelection(Intent data) {
         Uri selectedImageUri = data.getData();
         try {
             Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-            profileImage.setImageBitmap(imageBitmap);
+            // Display the selected image within the circular background using Glide
+            Glide.with(this)
+                    .load(imageBitmap)
+                    .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
+                    .into(profileImage);
 
-            // Set the bitmap in the singleton
+            // Set the bitmap in the singleton if needed
             ImageManager.getInstance().setImageBitmap(imageBitmap);
         } catch (IOException e) {
-            AndroidUtil.showToast(getApplicationContext(),e.getMessage());
+            AndroidUtil.showToast(getApplicationContext(), e.getMessage());
             e.printStackTrace();
         }
     }
@@ -204,9 +211,14 @@ public class RegisterActivity extends AppCompatActivity {
     private void handleImageCapture(Intent data) {
         Bundle extras = data.getExtras();
         Bitmap imageBitmap = (Bitmap) extras.get("data");
-        profileImage.setImageBitmap(imageBitmap);
+        // Display the captured image within the circular background using Glide
+        Glide.with(this)
+                .load(imageBitmap)
+                .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
+                .into(profileImage);
 
-        // Set the bitmap in the singleton
+        // Set the bitmap in the singleton if needed
         ImageManager.getInstance().setImageBitmap(imageBitmap);
     }
+
 }

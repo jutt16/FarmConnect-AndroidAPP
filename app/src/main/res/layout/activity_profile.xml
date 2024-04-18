@@ -4,14 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/teal_200"
     tools:context=".ProfileActivity">
+
+    <TextView
+        android:id="@+id/email_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="abc@example.com"
+        android:textColor="@color/agri"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.937"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name_textView"
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView2"
         android:layout_width="match_parent"
         android:layout_height="240dp"
-        android:background="@color/agri"
-        android:backgroundTint="@color/agri"
+        android:background="@color/grey"
+        android:backgroundTint="@color/grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -24,10 +41,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center">
+
             <androidx.cardview.widget.CardView
                 android:layout_width="210dp"
                 android:layout_height="210dp"
-                android:backgroundTint="@color/black"
+                android:backgroundTint="@color/agri_1"
                 app:cardCornerRadius="100dp"
                 android:layout_gravity="center">
 
@@ -35,7 +53,7 @@
                     android:id="@+id/profile_imageView"
                     android:layout_width="210dp"
                     android:layout_height="210dp"
-                    android:src="@drawable/logo"
+                    android:src="@drawable/baseline_person_24"
                     android:scaleType="centerCrop"
                     android:layout_gravity="center"
                     tools:ignore="MissingConstraints"
@@ -45,6 +63,15 @@
             </androidx.cardview.widget.CardView>
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/profile_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_vertical_dots"
+            android:padding="10dp"
+            android:layout_gravity="end"
+            app:tint="@color/white" />
 
     </androidx.cardview.widget.CardView>
 
@@ -71,11 +98,11 @@
         android:layout_gravity="center"
         android:text="03000000000"
         android:textColor="@color/agri"
-        android:textSize="25dp"
+        android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.053"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name_textView"
         app:layout_constraintVertical_bias="0.0" />

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/menu/profile_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/edit_profile"
+        android:title="Edit Profile"/>
+    <item
+        android:id="@+id/goto_home"
+        android:title="Home"/>
+    <!-- Add more items as needed -->
+</menu>
