@@ -1,6 +1,7 @@
 package com.example.farmconnect;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -33,6 +34,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.farmconnect.Adapters.ViewPagerMessengerAdapter;
 import com.example.farmconnect.utils.AndroidUtil;
 import com.example.farmconnect.utils.FirebaseUtil;
@@ -264,8 +268,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     // Load weather icon
-                    String iconUrl = "https://openweathermap.org/img/w/" + iconCode + ".png";
-                    AndroidUtil.showToast(getApplicationContext(),iconCode);
+                    String iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+//                    AndroidUtil.showToast(getApplicationContext(),iconCode);
 //                    AndroidUtil.setMenuItemIconFromUrl(getApplicationContext(), weatherIcon, iconUrl);
                     new LoadWeatherIconTask().execute(iconUrl);
                 } catch (JSONException e) {
@@ -279,6 +283,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Bitmap doInBackground(String... params) {
             String iconUrl = params[0];
+            Log.d("Icon Url",iconUrl);
             try {
                 URL url = new URL(iconUrl);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -287,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
                 return BitmapFactory.decodeStream(inputStream);
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.d("Weather Icon Error", "doInBackground: " + e.toString());
             }
             return null;
         }
@@ -298,10 +304,14 @@ public class MainActivity extends AppCompatActivity {
                 // Convert Bitmap to Drawable
                 Drawable iconDrawable = new BitmapDrawable(getResources(), bitmap);
                 weatherIcon.setIcon(iconDrawable);
-                Log.d("No problem","No issue");
+                Log.d("No problem", "No issue");
+            } else {
+                // Show toast message indicating failure to load icon
+                AndroidUtil.showToast(getApplicationContext(), "Failed to load weather icon");
             }
         }
     }
+
 
     void getFCMtoken(){
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
