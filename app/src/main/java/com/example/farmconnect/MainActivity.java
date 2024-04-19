@@ -265,6 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
                     // Load weather icon
                     String iconUrl = "https://openweathermap.org/img/w/" + iconCode + ".png";
+                    AndroidUtil.showToast(getApplicationContext(),iconCode);
+//                    AndroidUtil.setMenuItemIconFromUrl(getApplicationContext(), weatherIcon, iconUrl);
                     new LoadWeatherIconTask().execute(iconUrl);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -296,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
                 // Convert Bitmap to Drawable
                 Drawable iconDrawable = new BitmapDrawable(getResources(), bitmap);
                 weatherIcon.setIcon(iconDrawable);
+                Log.d("No problem","No issue");
             }
         }
     }
@@ -310,5 +313,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 }

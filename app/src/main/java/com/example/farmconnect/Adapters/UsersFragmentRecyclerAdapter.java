@@ -40,12 +40,8 @@ public class UsersFragmentRecyclerAdapter extends RecyclerView.Adapter<UsersFrag
         UsersFragmentModel user = userList.get(position);
         holder.usernameText.setText(user.getName());
         holder.address.setText(user.getAddress());
-        AndroidUtil.showToast(context,context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath());
-        Glide.with(context) // Provide a context
-                .load(context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath()) // Set the image URL
-                .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
-                .into(holder.profilePic); // Specify the ImageView to load the image into
-        // Set other views here
+//        AndroidUtil.showToast(context,context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath());
+        AndroidUtil.setImageByUrl(context,context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath(),holder.profilePic);
     }
 
     @Override
