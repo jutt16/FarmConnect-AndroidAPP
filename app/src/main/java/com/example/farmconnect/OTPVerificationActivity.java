@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -57,11 +58,17 @@ public class OTPVerificationActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
     UserModel userModel;
+    Boolean register;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otpverification);
+
+        register = true;
+        if(getIntent().hasExtra("register")) {
+            register = getIntent().getBooleanExtra("register",true);
+        }
 
         otpInput = findViewById(R.id.otpCode);
         btnVerifyOTP = findViewById(R.id.OTPVerificationButton);
@@ -195,7 +202,9 @@ public class OTPVerificationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 setInProgress(false);
                 if (task.isSuccessful()) {
-                    registerAPI(userModel);
+                    if(register){
+                        registerAPI(userModel);
+                    }
                     proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to create user document: " + task.getException().getMessage());
@@ -215,7 +224,10 @@ public class OTPVerificationActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 setInProgress(false);
                 if (task.isSuccessful()) {
-                    registerAPI(userModel);
+                    if(register)
+                    {
+                        registerAPI(userModel);
+                    }
                     proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to update user document: " + task.getException().getMessage());
@@ -225,21 +237,31 @@ public class OTPVerificationActivity extends AppCompatActivity {
     }
 
     private void proceedToNextActivity(UserModel userModel) {
-        Intent intent = new Intent(OTPVerificationActivity.this, LoginActivity.class);
+        Intent intent = new Intent(OTPVerificationActivity.this, MainActivity.class);
         intent.putExtra("user", userModel);
         AndroidUtil.showToast(getApplicationContext(), "OTP verified successfully");
         startActivity(intent);
     }
 
     private void registerAPI(UserModel userModel) {
-        OkHttpClient client = new OkHttpClient().newBuilder().build();
-
-        // Convert the Bitmap to a File
-        File imageFile = FileUtils.createImageFileFromBitmap(getApplicationContext(), ImageManager.getInstance().getImageBitmap());
-        if (imageFile == null) {
-            // Handle error creating file
+        // Get the bitmap from ImageManager
+        Bitmap bitmap = ImageManager.getInstance().getImageBitmap();
+        if (bitmap == null) {
+            // Handle error: Bitmap is null
+            Log.e("registerAPI", "Bitmap is null");
             return;
         }
+
+        // Convert the Bitmap to a File
+        File imageFile = FileUtils.createImageFileFromBitmap(getApplicationContext(), bitmap);
+        if (imageFile == null) {
+            // Handle error: Image file creation failed
+            Log.e("registerAPI", "Failed to create image file");
+            return;
+        }
+
+        // OkHttpClient setup
+        OkHttpClient client = new OkHttpClient();
 
         // Prepare the request body
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -257,8 +279,8 @@ public class OTPVerificationActivity extends AppCompatActivity {
 
         // Prepare the request
         Request request = new Request.Builder()
-                .url(getApplicationContext().getResources().getString(R.string.api_base_url) + ":8000/api/user/store")
-                .method("POST", body)
+                .url(getApplicationContext().getResources().getString(R.string.api_base_url) + ":8000/api/register")
+                .post(body)
                 .build();
 
         // Send the request asynchronously
@@ -270,10 +292,22 @@ public class OTPVerificationActivity extends AppCompatActivity {
                     // Handle success response
                     String responseBody = response.body().string();
                     Log.d("Success: ", responseBody);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidUtil.showToast(getApplicationContext(),"Registered Successfully!");
+                        }
+                    });
                 } else {
                     // Handle failure response
                     String responseBody = response.body().string();
                     Log.d("Failure1: ", responseBody);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidUtil.showToast(getApplicationContext(),"Registration Failed!"+responseBody);
+                        }
+                    });
                 }
             }
 
@@ -286,5 +320,6 @@ public class OTPVerificationActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

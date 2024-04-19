@@ -48,15 +48,15 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/username"
+                android:id="@+id/mobile"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="40dp"
                 android:background="@drawable/custom_edittext"
-                android:drawableLeft="@drawable/baseline_person_24"
+                android:drawableLeft="@drawable/baseline_phone_24"
                 android:drawablePadding="8dp"
                 android:drawableTint="@color/agri"
-                android:hint="Username"
+                android:hint="Mobile No"
                 android:padding="8dp"
                 android:textColor="@color/black"
                 android:textColorHighlight="@color/cardview_dark_background"
