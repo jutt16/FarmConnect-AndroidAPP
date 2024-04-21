@@ -1,5 +1,6 @@
 package com.example.farmconnect;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,17 @@ public class MessagesFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_messages, container, false);
         recyclerView = view.findViewById(R.id.recycler_view);
         setupRecyclerView();
+        // Inside your activity or fragment class
+        View includedLayout =view.findViewById(R.id.bot_in_list_layout);
+        includedLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AndroidUtil.showToast(getContext(),"Welcome to Farm Chat Bot!");
+                Intent intent = new Intent(getContext(),ChatBotActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         return view;
     }

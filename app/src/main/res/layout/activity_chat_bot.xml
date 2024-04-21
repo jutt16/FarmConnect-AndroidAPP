@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity">
+    tools:context=".ChatBotActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text= "Username"
+            android:text= "Farm Chat Bot"
             android:textSize="22sp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -25,9 +25,9 @@
             android:layout_toRightOf="@+id/profile_pic_layout"
             android:id="@+id/other_username"/>
 
-        <include layout="@layout/profile_pic_view"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <include layout="@layout/bot_profile"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_marginStart="10dp"
             android:layout_toRightOf="@+id/back_btn"
             android:id="@+id/profile_pic_layout"/>
@@ -59,6 +59,7 @@
         android:id="@+id/bottom_layout">
 
         <EditText
+            android:id="@+id/chat_nessage_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -70,8 +71,7 @@
             android:background="@drawable/edit_text_rounded_corner"
             android:elevation="4dp"
             android:hint="Write message here"
-            android:padding="10dp"
-            android:id="@+id/chat_nessage_input"/>
+            android:padding="10dp" />
 
         <ImageButton
             android:id="@+id/message_send_btn"

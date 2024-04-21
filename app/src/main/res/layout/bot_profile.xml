@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/bot"
+        android:src="@drawable/bot_icon"
+        android:background="@drawable/circular_bg"
+        android:backgroundTint="@color/white"
+        android:layout_centerVertical="true"
+        android:scaleType="centerCrop"
+        android:padding="10dp"
+        android:layout_height="52dp"
+        android:layout_width="52dp"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"/>
+
+</RelativeLayout>
