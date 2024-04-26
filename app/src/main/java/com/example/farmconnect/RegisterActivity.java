@@ -95,6 +95,30 @@ public class RegisterActivity extends AppCompatActivity {
             return false;
         }
 
+        // Check for at least one lowercase letter
+        if (!password.matches(".*[a-z].*")) {
+            AndroidUtil.showToast(getApplicationContext(), "Password must contain at least one lowercase letter");
+            return false;
+        }
+
+        // Check for at least one digit
+        if (!password.matches(".*\\d.*")) {
+            AndroidUtil.showToast(getApplicationContext(), "Password must contain at least one digit");
+            return false;
+        }
+
+        // Check for at least one special character
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+            AndroidUtil.showToast(getApplicationContext(), "Password must contain at least one special character");
+            return false;
+        }
+
+        // Check for at least one uppercase letter
+        if (!password.matches(".*[A-Z].*")) {
+            AndroidUtil.showToast(getApplicationContext(), "Password must contain at least one uppercase letter");
+            return false;
+        }
+
         if (!password.equals(confirmPassword)) {
             AndroidUtil.showToast(getApplicationContext(), "Passwords do not match");
             return false;
@@ -107,6 +131,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         return true;
     }
+
 
     public void selectImage(View view) {
         if (checkCameraPermission()) {

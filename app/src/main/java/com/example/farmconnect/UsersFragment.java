@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.farmconnect.Adapters.UsersFragmentRecyclerAdapter;
 import com.example.farmconnect.Models.UsersFragmentModel;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.ApiCalls;
+import com.example.farmconnect.utils.TokenManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -31,6 +33,7 @@ import okhttp3.Response;
 public class UsersFragment extends Fragment {
     private RecyclerView userRecyclerView;
     private UsersFragmentRecyclerAdapter userAdapter;
+    private RecyclerView requestsRecyclerView;
     private OkHttpClient client;
 
     public UsersFragment() {
@@ -43,9 +46,13 @@ public class UsersFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_users, container, false);
         userRecyclerView = view.findViewById(R.id.users_recycler_view);
+        requestsRecyclerView = view.findViewById(R.id.requests_recycler_view);
+
         userRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        requestsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Make API call to fetch user data
+        ApiCalls.fetchRequests(requestsRecyclerView,getContext());
         fetchUserData();
 
         return view;
@@ -53,8 +60,8 @@ public class UsersFragment extends Fragment {
 
     private void fetchUserData() {
         Request request = new Request.Builder()
-                .url(getContext().getResources().getString(R.string.api_base_url)+":8000/api/usersList")
-                .addHeader("Authorization", "Bearer 61|Cr4LAZvWPDQdEQp9lWmqnSKlEIuJjco2tzPmssKG3eba823c")
+                .url(getContext().getResources().getString(R.string.api_base_url)+":8000/api/notFriendsList")
+                .addHeader("Authorization", "Bearer "+ TokenManager.getToken(getContext()))
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
@@ -62,6 +69,12 @@ public class UsersFragment extends Fragment {
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
                 // Handle failure, such as showing an error message
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidUtil.showToast(getContext(),"failed to load users!"+e.getMessage());
+                    }
+                });
             }
 
             @Override
@@ -75,13 +88,6 @@ public class UsersFragment extends Fragment {
                         public void run() {
                             userAdapter = new UsersFragmentRecyclerAdapter(userList,getContext());
                             userRecyclerView.setAdapter(userAdapter);
-//                            AndroidUtil.showToast(getContext(),"Success"+userList.toString());
-                            // Assuming this loop is part of a method in your Fragment or Activity
-//                            Log.d("Data",responseData);
-//                            for (UsersFragmentModel item : userList) {
-//                                // Update UI elements or perform other operations
-//                                Log.d(item.getName(),item.getProfileImagePath());// Custom method to update the UI
-//                            }
                         }
                     });
                 } else {
@@ -105,7 +111,7 @@ public class UsersFragment extends Fragment {
             for (int i = 0; i < dataArray.length(); i++) {
                 JSONObject userObject = dataArray.getJSONObject(i);
                 UsersFragmentModel user = new UsersFragmentModel();
-                user.setId(userObject.getInt("id"));
+                user.setId(userObject.getString("id"));
                 user.setUserId(userObject.getString("user_id"));
                 user.setName(userObject.getString("name"));
                 user.setAddress(userObject.optString("address")); // Handles null automatically

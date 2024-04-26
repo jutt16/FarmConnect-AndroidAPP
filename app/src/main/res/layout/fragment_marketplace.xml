@@ -141,6 +141,12 @@
                                 android:text="$2,500 · Tennis Shoes"
                                 android:textAlignment="center"
                                 android:textAppearance="?attr/textAppearanceSubtitle2" />
+
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="200dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/logo" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -193,12 +199,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical">
-
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="200dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/logo" />
 
                             <TextView
                                 android:layout_width="match_parent"

@@ -40,6 +40,9 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.farmconnect.Adapters.ViewPagerMessengerAdapter;
 import com.example.farmconnect.utils.AndroidUtil;
 import com.example.farmconnect.utils.FirebaseUtil;
+import com.example.farmconnect.utils.TokenManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -68,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AndroidUtil.showToast(getApplicationContext(), TokenManager.getToken(getApplicationContext()));
 
         // Initializing Elements
         tabLayout = findViewById(R.id.tab_layout);
@@ -152,6 +157,18 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.settings) {
             //goto settings
             AndroidUtil.showToast(getApplicationContext(),"Settings Option");
+        } else if(item.getItemId() == R.id.logout_btn) {
+            FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        FirebaseUtil.logout();
+                        Intent intent = new Intent(getApplicationContext(),SplashActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+                }
+            });
         }
         return true;
     }

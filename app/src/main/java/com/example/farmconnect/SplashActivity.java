@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
 import com.example.farmconnect.utils.FirebaseUtil;
+import com.example.farmconnect.utils.TokenManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -20,7 +21,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        if(FirebaseUtil.isLoggedIn()) {
+        if(FirebaseUtil.isLoggedIn() && TokenManager.hasToken(getApplicationContext())) {
             Bundle extras = getIntent().getExtras();
             if(extras != null && extras.containsKey("userId")) {
                 // From notifications with a userId

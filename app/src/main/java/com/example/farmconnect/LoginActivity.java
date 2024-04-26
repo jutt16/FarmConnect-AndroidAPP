@@ -2,6 +2,7 @@ package com.example.farmconnect;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callLoginAPI(mobileEditText.getText().toString(),passwordEditText.getText().toString());
+                callLoginAPI(mobileEditText.getText().toString(),passwordEditText.getText().toString(),getApplicationContext());
 //                AndroidUtil.showToast(getApplicationContext(),userModel.getUserName());
             }
         });
@@ -72,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    public void callLoginAPI(String mobile, String password) {
+    public void callLoginAPI(String mobile, String password, Context context) {
         OkHttpClient client = new OkHttpClient();
 
         // Prepare the JSON request body with dynamic values
@@ -111,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
                     try {
+                        AndroidUtil.parseAndSetToken(context,responseBody);
                         JSONObject json = new JSONObject(responseBody);
                         JSONObject data = json.getJSONObject("data");
                         userModel.setUserId(data.getString("user_id"));

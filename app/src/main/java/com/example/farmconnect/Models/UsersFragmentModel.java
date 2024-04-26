@@ -3,7 +3,7 @@ package com.example.farmconnect.Models;
 import java.util.List;
 
 public class UsersFragmentModel {
-    private int id;
+    private String id;
     private String userId;
     private String name;
     private String address;
@@ -13,7 +13,7 @@ public class UsersFragmentModel {
     public UsersFragmentModel() {
     }
 
-    public UsersFragmentModel(int id, String userId, String name, String address, List<String> roles, String profileImagePath) {
+    public UsersFragmentModel(String id, String userId, String name, String address, List<String> roles, String profileImagePath) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -22,11 +22,11 @@ public class UsersFragmentModel {
         this.profileImagePath = profileImagePath;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

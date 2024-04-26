@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.farmconnect.ChatActivity;
+import com.example.farmconnect.FullScreenImageActivity;
 import com.example.farmconnect.Models.ChatRoomModel;
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.R;
@@ -23,9 +24,10 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
 public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoomModel, RecentChatRecyclerAdapter.ChatRoomModelViewHolder> {
     Context context;
+
     public RecentChatRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatRoomModel> options, Context context) {
         super(options);
-        this.context=context;
+        this.context = context;
     }
 
     @Override
@@ -33,22 +35,31 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 
         FirebaseUtil.getOtherUserFromChatroom(model.getUserIds())
                 .get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(FirebaseUtil.currentUserId());
 
-                        UserModel otherUserModel= task.getResult().toObject(UserModel.class);
+                        UserModel otherUserModel = task.getResult().toObject(UserModel.class);
 
                         FirebaseUtil.getOtherProfilePicStorageRef(otherUserModel.getUserId()).getDownloadUrl()
                                 .addOnCompleteListener(t -> {
-                                    if(t.isSuccessful()){
+                                    if (t.isSuccessful()) {
                                         Uri uri = t.getResult();
-                                        AndroidUtil.setProfilePic(context,uri,holder.profilePic);
+                                        AndroidUtil.setProfilePic(context, uri, holder.profilePic);
                                     }
                                 });
 
+                        holder.profilePic.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(context,FullScreenImageActivity.class);
+                                intent.putExtra("otherUser",otherUserModel);
+                                context.startActivity(intent);
+                            }
+                        });
+
                         holder.usernameText.setText(otherUserModel.getUserName());
                         if (lastMessageSentByMe) {
-                            holder.lastMessageText.setText("You :"+model.getLastMessage());
+                            holder.lastMessageText.setText("You :" + model.getLastMessage());
                         } else {
                             holder.lastMessageText.setText(model.getLastMessage());
                         }
@@ -57,7 +68,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                         holder.itemView.setOnClickListener(v -> {
 
                             Intent intent = new Intent(context, ChatActivity.class);
-                            AndroidUtil.passUserModelAsIntent(intent,otherUserModel);
+                            AndroidUtil.passUserModelAsIntent(intent, otherUserModel);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(intent);
 
@@ -71,16 +82,17 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
     @NonNull
     @Override
     public ChatRoomModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.recent_chat_recycler_row,parent,false);
+        View view = LayoutInflater.from(context).inflate(R.layout.recent_chat_recycler_row, parent, false);
 
         return new ChatRoomModelViewHolder(view);
     }
 
-    class ChatRoomModelViewHolder extends RecyclerView.ViewHolder {
+    static class ChatRoomModelViewHolder extends RecyclerView.ViewHolder {
         TextView usernameText;
         TextView lastMessageText;
         TextView lastMessageTime;
         ImageView profilePic;
+
         public ChatRoomModelViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -90,6 +102,4 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
             profilePic = itemView.findViewById(R.id.profile_pic_image_view);
         }
     }
-
 }
-

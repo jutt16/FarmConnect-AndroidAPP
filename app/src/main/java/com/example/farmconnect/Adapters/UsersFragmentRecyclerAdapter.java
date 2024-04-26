@@ -1,6 +1,9 @@
 package com.example.farmconnect.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.farmconnect.FullScreenImageActivity;
 import com.example.farmconnect.Models.UsersFragmentModel;
 import com.example.farmconnect.R;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.ApiCalls;
 
 import java.util.List;
 
@@ -40,8 +45,33 @@ public class UsersFragmentRecyclerAdapter extends RecyclerView.Adapter<UsersFrag
         UsersFragmentModel user = userList.get(position);
         holder.usernameText.setText(user.getName());
         holder.address.setText(user.getAddress());
-//        AndroidUtil.showToast(context,context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath());
-        AndroidUtil.setImageByUrl(context,context.getResources().getString(R.string.api_base_url)+user.getProfileImagePath(),holder.profilePic);
+        String url = context.getResources().getString(R.string.api_base_url) + user.getProfileImagePath();
+        AndroidUtil.setImageByUrl(context, url, holder.profilePic);
+
+        holder.profilePic.setOnClickListener(view -> {
+            Intent intent = new Intent(context, FullScreenImageActivity.class);
+            intent.putExtra("url", url);
+            context.startActivity(intent);
+        });
+
+        holder.friend_btn.setOnClickListener(view -> {
+            int adapterPosition = holder.getAdapterPosition();
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                ApiCalls.sendFriendRequest(context, userList.get(adapterPosition).getId(), holder.friend_btn, success -> {
+                    if (success) {
+                        // Handle successful friend request logic
+                        // Remove the item from the data set
+                        userList.remove(adapterPosition);
+                        notifyItemRemoved(adapterPosition);
+                        notifyItemRangeChanged(adapterPosition, userList.size());
+                    } else {
+                        // Handle failure logic
+                        // Optionally, you can display an error message here
+                        AndroidUtil.showToast(context, "Failed to send friend request.");
+                    }
+                });
+            }
+        });
     }
 
     @Override

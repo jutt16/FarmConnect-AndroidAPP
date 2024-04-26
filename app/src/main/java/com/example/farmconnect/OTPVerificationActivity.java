@@ -3,8 +3,10 @@ package com.example.farmconnect;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,8 @@ import com.example.farmconnect.utils.FileUtils;
 import com.example.farmconnect.utils.FirebaseUtil;
 import com.example.farmconnect.utils.ImageManager;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.Timestamp;
@@ -28,6 +32,9 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +74,7 @@ public class OTPVerificationActivity extends AppCompatActivity {
 
         register = true;
         if(getIntent().hasExtra("register")) {
-            register = getIntent().getBooleanExtra("register",true);
+            register = getIntent().getBooleanExtra("register",false);
         }
 
         otpInput = findViewById(R.id.otpCode);
@@ -172,6 +179,10 @@ public class OTPVerificationActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
                                 DocumentSnapshot document = task.getResult();
+                                if(!register) {
+                                    proceedToNextActivity(userModel);
+                                    return;
+                                }
                                 if (document.exists()) {
                                     // Document exists, update the data
                                     updateUserDocument(document, userModel);
@@ -203,9 +214,9 @@ public class OTPVerificationActivity extends AppCompatActivity {
                 setInProgress(false);
                 if (task.isSuccessful()) {
                     if(register){
-                        registerAPI(userModel);
+                        storeImage();
+                        registerAPI(userModel,getApplicationContext());
                     }
-                    proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to create user document: " + task.getException().getMessage());
                 }
@@ -226,14 +237,39 @@ public class OTPVerificationActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     if(register)
                     {
-                        registerAPI(userModel);
+                        storeImage();
+                        registerAPI(userModel,getApplicationContext());
                     }
-                    proceedToNextActivity(userModel);
                 } else {
                     AndroidUtil.showToast(getApplicationContext(), "Failed to update user document: " + task.getException().getMessage());
                 }
             }
         });
+    }
+
+    public void storeImage() {
+        // Convert Bitmap to File
+        File imageFile = AndroidUtil.convertBitmapToFile(ImageManager.getInstance().getImageBitmap(), getApplicationContext());
+
+        // Upload File to Firebase Storage
+        StorageReference imageRef = FirebaseUtil.getCurrentProfilePicStorageRef();
+
+        UploadTask uploadTask = imageRef.putFile(Uri.fromFile(imageFile));
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Image uploaded successfully
+                // Handle success
+                AndroidUtil.showToast(getApplicationContext(),"Image Uploaded");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Handle unsuccessful upload
+                AndroidUtil.showToast(getApplicationContext(),"Image Upload Failed");
+            }
+        });
+
     }
 
     private void proceedToNextActivity(UserModel userModel) {
@@ -243,7 +279,7 @@ public class OTPVerificationActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void registerAPI(UserModel userModel) {
+    private void registerAPI(UserModel userModel, Context context) {
         // Get the bitmap from ImageManager
         Bitmap bitmap = ImageManager.getInstance().getImageBitmap();
         if (bitmap == null) {
@@ -295,7 +331,9 @@ public class OTPVerificationActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            AndroidUtil.showToast(getApplicationContext(),"Registered Successfully!");
+                            AndroidUtil.showToast(context, "Registered Successfully!");
+                            AndroidUtil.parseAndSetToken(context,responseBody);
+                            proceedToNextActivity(userModel);
                         }
                     });
                 } else {
@@ -306,19 +344,34 @@ public class OTPVerificationActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             AndroidUtil.showToast(getApplicationContext(),"Registration Failed!"+responseBody);
+                            gotoRegisterActivity();
                         }
                     });
                 }
             }
-
             @Override
             public void onFailure(Call call, IOException e) {
                 // Handle failure to connect to the server
                 e.printStackTrace();
                 Log.d("Failure2:", e.getMessage());
-                AndroidUtil.showToast(getApplicationContext(), "Failure: " + e.getMessage());
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AndroidUtil.showToast(getApplicationContext(), "Internal Server Error\nRegistration Failed");
+//                            OTPVerificationActivity.super.onBackPressed();
+                            gotoRegisterActivity();
+                        }
+                    });
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
+    }
+    public void gotoRegisterActivity(){
+        Intent intent = new Intent(OTPVerificationActivity.this,RegisterActivity.class);
+        startActivity(intent);
     }
 
 

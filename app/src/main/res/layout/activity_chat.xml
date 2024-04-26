@@ -7,39 +7,40 @@
     tools:context=".ChatActivity">
 
     <RelativeLayout
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/agri"
-        android:padding="10dp"
-        android:id="@+id/toolbar">
+        android:padding="10dp">
 
         <TextView
+            android:id="@+id/other_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text= "Username"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:layout_marginStart="10dp"
             android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
             android:layout_toRightOf="@+id/profile_pic_layout"
-            android:id="@+id/other_username"/>
+            android:text="Username"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-        <include layout="@layout/profile_pic_view"
+        <include
+            android:id="@+id/profile_pic_layout"
+            layout="@layout/profile_pic_view"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="10dp"
-            android:layout_toRightOf="@+id/back_btn"
-            android:id="@+id/profile_pic_layout"/>
+            android:layout_toRightOf="@+id/back_btn" />
 
         <ImageButton
+            android:id="@+id/back_btn"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/baseline_arrow_back_24"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="@color/white"
             android:layout_centerVertical="true"
-            android:id="@+id/back_btn"/>
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/baseline_arrow_back_24"
+            app:tint="@color/white" />
 
 
     </RelativeLayout>
