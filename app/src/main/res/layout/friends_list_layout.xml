@@ -1,7 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:elevation="4dp"
+    android:background="@color/off_white"
+    android:layout_marginHorizontal="5dp">
+
+    <ImageView
+        android:id="@+id/friend_profile_pic"
+        android:src="@drawable/baseline_person_24"
+        android:scaleType="centerCrop"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:maxWidth="100dp"
+        android:text="User name"
+        android:textSize="16dp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:id="@+id/user_name_text"/>
+
+    <TextView
+        android:id="@+id/mobile_text"
+        android:layout_width="100dp"
+        android:textSize="10dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:maxWidth="100dp"
+        android:text="mobile no" />
+
+    <TextView
+        android:id="@+id/address_text"
+        android:layout_width="100dp"
+        android:textSize="8dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:maxWidth="100dp"
+        android:text="Address" />
 
 </LinearLayout>

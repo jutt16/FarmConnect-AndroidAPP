@@ -2,6 +2,8 @@ package com.example.farmconnect;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.ApiCalls;
 import com.example.farmconnect.utils.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
     TextView email_textview;
     UserModel currentUserModel;
     ImageButton btn_back;
+    RecyclerView friends_list_recycler_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,10 @@ public class ProfileActivity extends AppCompatActivity {
         mobile_textview = findViewById(R.id.phone_textView);
         email_textview = findViewById(R.id.email_textView);
         btn_back = findViewById(R.id.back_btn);
+        friends_list_recycler_view = findViewById(R.id.friends_list_recycler_view);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        friends_list_recycler_view.setLayoutManager(layoutManager);
 
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +77,8 @@ public class ProfileActivity extends AppCompatActivity {
                 showPopupMenu(v);
             }
         });
+
+        ApiCalls.fetchFriends(friends_list_recycler_view,getApplicationContext());
     }
 
     private void showPopupMenu(View v) {

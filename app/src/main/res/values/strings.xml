@@ -2,9 +2,7 @@
     <string name="app_name">FarmConnect</string>
     <string name="logo">Logo</string>
     <string name="welcome">Welcome To</string>
-    <string name="farmconnect">FarmConnect</string>
+    <string name="farm_connect">FarmConnect</string>
     <string name="profile_image">Profile Image</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="api_base_url">http://192.168.0.106</string>
+    <string name="api_base_url">http://192.168.87.234</string>
 </resources>

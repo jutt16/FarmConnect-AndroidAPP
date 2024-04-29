@@ -115,4 +115,17 @@ public class AndroidUtil {
             Log.e("TokenManager", "Error parsing JSON or extracting token: " + e.getMessage());
         }
     }
+
+    public static void setImageByUrlwithfixsize(Context context, String imageUrl, ImageView friendProfileImage) {
+        Glide.with(context)
+                .load(imageUrl)
+                .apply(RequestOptions.centerCropTransform())
+                .into(friendProfileImage);
+    }
+    public static void setProfilePicByUrl(Context context, String imageUrl, ImageView imageView){
+        Glide.with(context)
+                .load(imageUrl)
+                .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
+                .into(imageView);
+    }
 }

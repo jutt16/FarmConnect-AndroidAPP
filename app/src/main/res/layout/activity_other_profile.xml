@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".ProfileActivity">
+    tools:context=".OtherProfileActivity">
 
     <LinearLayout
         android:id="@+id/main_profile"
@@ -26,7 +26,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:layout_toRightOf="@+id/back_btn"
-                android:text="Your Profile"
+                android:text="Friends Profile"
                 android:textColor="@color/white"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -38,15 +38,6 @@
                 android:layout_centerVertical="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/baseline_arrow_back_24"
-                app:tint="@color/white" />
-
-            <ImageView
-                android:id="@+id/profile_menu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_vertical_dots"
-                android:padding="10dp"
-                android:layout_alignParentEnd="true"
                 app:tint="@color/white" />
 
 
@@ -105,13 +96,22 @@
                         android:textSize="14dp" />
 
                     <TextView
-                        android:id="@+id/email_textView"
+                        android:id="@+id/address_textView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxWidth="180dp"
-                        android:text="abc@example.com"
+                        android:text="address"
                         android:textColor="@color/white"
                         android:textSize="14dp" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="UnFriend"
+                        android:textColor="@color/off_white"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:id="@+id/unfriend_btn"/>
 
                 </LinearLayout>
 

@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         AndroidUtil.showToast(getApplicationContext(), TokenManager.getToken(getApplicationContext()));
+        Log.d("Token",TokenManager.getToken(getApplicationContext()));
 
         // Initializing Elements
         tabLayout = findViewById(R.id.tab_layout);
