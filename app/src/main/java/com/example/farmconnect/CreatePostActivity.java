@@ -14,6 +14,7 @@ import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.example.farmconnect.utils.AndroidUtil;
+import com.example.farmconnect.utils.FirebaseUtil;
 
 public class CreatePostActivity extends AppCompatActivity {
     private static final int REQUEST_MEDIA_PICK = 1;
@@ -21,7 +22,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private ImageView imageView,user_image;
     private VideoView videoView;
     private MediaController mediaController;
-    Button reselect;
+    Button reselect,upload_post_btn;
     Uri postUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,15 @@ public class CreatePostActivity extends AppCompatActivity {
         videoView = findViewById(R.id.postVideo);
         reselect = findViewById(R.id.reselect);
         user_image = findViewById(R.id.user_image);
+        upload_post_btn = findViewById(R.id.upload_post_btn);
+
+        FirebaseUtil.getCurrentProfilePicStorageRef().getDownloadUrl()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        Uri uri = task.getResult();
+                        AndroidUtil.setProfilePic(getApplicationContext(),uri,user_image);
+                    }
+                });
 
         // Create MediaController
         mediaController = new MediaController(this);
