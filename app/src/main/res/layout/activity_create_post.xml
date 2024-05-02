@@ -28,6 +28,7 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:id="@+id/user_image"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginLeft="10dp"
@@ -43,7 +44,7 @@
                     android:layout_marginBottom="30dp"
                     android:background="@null"
                     android:gravity="start"
-                    android:hint="What's interesting about your photo?"
+                    android:hint="What's interesting about your post?"
                     android:lines="7" />
             </LinearLayout>
 

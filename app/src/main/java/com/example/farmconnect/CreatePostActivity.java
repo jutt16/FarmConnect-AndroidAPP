@@ -18,7 +18,7 @@ import com.example.farmconnect.utils.AndroidUtil;
 public class CreatePostActivity extends AppCompatActivity {
     private static final int REQUEST_MEDIA_PICK = 1;
 
-    private ImageView imageView;
+    private ImageView imageView,user_image;
     private VideoView videoView;
     private MediaController mediaController;
     Button reselect;
@@ -32,6 +32,7 @@ public class CreatePostActivity extends AppCompatActivity {
         imageView = findViewById(R.id.postImage);
         videoView = findViewById(R.id.postVideo);
         reselect = findViewById(R.id.reselect);
+        user_image = findViewById(R.id.user_image);
 
         // Create MediaController
         mediaController = new MediaController(this);

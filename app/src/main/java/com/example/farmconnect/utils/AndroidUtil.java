@@ -1,40 +1,56 @@
 package com.example.farmconnect.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.farmconnect.Models.UserModel;
-import com.example.farmconnect.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 public class AndroidUtil {
+
+    public static Bitmap createVideoThumbnail(Uri videoUri,Context mContext) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(mContext, videoUri);
+            // Retrieve a frame at the given time (in microseconds)
+            return retriever.getFrameAtTime();
+        } catch (Exception e) {
+            Log.e("CreatePostActivity", "Error retrieving video thumbnail: " + e.getMessage());
+            return null;
+        }
+    }
+    public static String getRealPathFromURI(Uri uri,Context context) {
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(projection[0]);
+            String realPath = cursor.getString(columnIndex);
+            cursor.close();
+            Log.d("Path:",realPath);
+            return realPath;
+        } else {
+            Log.d("Path:",uri.getPath());
+            return uri.getPath();
+        }
+    }
     public static void showToast(Context context,String message) {
         Toast.makeText(context,message,Toast.LENGTH_LONG).show();
     }
@@ -128,4 +144,31 @@ public class AndroidUtil {
                 .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
                 .into(imageView);
     }
+    public static String getFileExtensionFromUri(Context context,Uri uri) {
+        String extension=null;
+        // Determine the MIME type of the media using ContentResolver
+        String mimeType = context.getContentResolver().getType(Uri.parse(uri.toString()));
+        if (mimeType != null) {
+            switch (mimeType) {
+                case "video/mp4":
+                    extension = ".mp4";
+                    break;
+                case "image/jpeg":
+                    extension = ".jpg";
+                    break;
+                case "image/png":
+                    extension = ".png";
+                    break;
+                case "video/avi":
+                    extension = ".avi";
+                    break;
+                // Add more cases as needed for different MIME types
+                default:
+                    extension = ".dat";  // Default or unknown type handling
+                    break;
+            }
+        }
+        return extension;
+    }
+
 }

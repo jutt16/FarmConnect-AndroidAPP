@@ -4,5 +4,5 @@
     <string name="welcome">Welcome To</string>
     <string name="farm_connect">FarmConnect</string>
     <string name="profile_image">Profile Image</string>
-    <string name="api_base_url">http://192.168.87.234</string>
+    <string name="api_base_url">http://192.168.0.103</string>
 </resources>
