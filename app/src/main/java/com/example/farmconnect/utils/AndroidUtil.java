@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -21,9 +22,30 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 public class AndroidUtil {
+    // Method to decode a Uri to a Bitmap
+    public static Bitmap uriToBitmap(Context context, Uri uri) {
+        try {
+            // Open an input stream from the Uri
+            InputStream inputStream = context.getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                // Decode the input stream into a Bitmap
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                inputStream.close(); // Close the input stream
+                return bitmap; // Return the decoded Bitmap
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if unable to decode Bitmap
+    }
 
     public static Bitmap createVideoThumbnail(Uri videoUri,Context mContext) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
