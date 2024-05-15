@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp"
+    android:orientation="vertical"
+    android:elevation="8dp"
+    app:cardBackgroundColor="@color/white"
+    app:contentPadding="2dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/loadcomment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/circular_bg"
+            android:backgroundTint="@color/agri"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/baseline_person_24" />
+
+        <TextView
+            android:id="@+id/comment_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/loadcomment"
+            android:text="Anni"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/commenttext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/comment_name"
+            android:layout_toEndOf="@id/loadcomment"
+            android:layout_toRightOf="@id/loadcomment"
+            android:text="Actual Comment"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/commenttime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/commenttext"
+            android:layout_toEndOf="@id/loadcomment"
+            android:layout_toRightOf="@id/loadcomment"
+            android:text="12/06/19" />
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

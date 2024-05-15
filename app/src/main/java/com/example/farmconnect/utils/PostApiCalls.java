@@ -1,13 +1,12 @@
 package com.example.farmconnect.utils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.farmconnect.R;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -46,7 +45,7 @@ public class PostApiCalls {
         RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("content", "media" + fileType, RequestBody.create(mediaType, file))
                 .addFormDataPart("file_type", fileType)
-                .addFormDataPart("description", description)
+                .addFormDataPart("discription", description)
                 .build();
 
         // Build the request
@@ -84,6 +83,95 @@ public class PostApiCalls {
         void onSuccess(String response);
         void onFailure(Exception e);
     }
+    // New method for fetching posts
+    public static void getPosts(Context context, final PostCallback callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    OkHttpClient client = new OkHttpClient().newBuilder().build();
 
+                    // Build the request
+                    Request request = new Request.Builder()
+                            .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/getPosts")
+                            .method("GET", null)
+                            .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                            .build();
+
+                    // Execute the request
+                    Response response = client.newCall(request).execute();
+
+                    if (response.isSuccessful()) {
+                        return response.body().string();
+                    } else {
+                        throw new IOException("Unsuccessful response: " + response.code());
+                    }
+                } catch (IOException e) {
+                    // Handle failure
+                    Log.e("Error", "Failed to make request: " + e.getMessage());
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String responseBody) {
+                if (responseBody != null) {
+                    callback.onSuccess(responseBody);
+                } else {
+                    // Handle unsuccessful response
+                    Log.e("Error", "Response body is null");
+                    callback.onFailure(new IOException("Response body is null"));
+                }
+            }
+        }.execute();
+    }
+
+    // New method for fetching likes
+    public static void getPostsLikes(Context context,String id, final PostCallback callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+                    //MediaType mediaType = MediaType.parse("application/json");
+                    //RequestBody body = RequestBody.create(mediaType, "{\r\n    \"post_id\": "+id+"\r\n}");
+
+                    // Build the request
+                    Request request = new Request.Builder()
+                            .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/postLikes?post_id="+id)
+                            .method("GET", null)
+                            .addHeader("Content-Type", "application/json")
+                            .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                            .build();
+
+                    // Execute the request
+                    Response response = client.newCall(request).execute();
+
+                    if (response.isSuccessful()) {
+                        Log.d("Likes",response.body().toString());
+                        return response.body().string();
+                    } else {
+                        throw new IOException("Unsuccessful response: " + response.code());
+                    }
+                } catch (IOException e) {
+                    // Handle failure
+                    Log.e("Error", "Failed to make request: " + e.getMessage());
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String responseBody) {
+                if (responseBody != null) {
+                    callback.onSuccess(responseBody);
+                } else {
+                    // Handle unsuccessful response
+                    Log.e("Error", "Response body is null");
+                    callback.onFailure(new IOException("Response body is null"));
+                }
+            }
+        }.execute();
+    }
 
 }

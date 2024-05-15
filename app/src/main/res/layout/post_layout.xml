@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
     android:elevation="10dp"
@@ -10,7 +10,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingVertical="3dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +49,7 @@
                     android:layout_marginLeft="3dp"
                     android:textStyle="bold"
                     android:textColor="@color/grey"
-                    android:text="created at Date: 04-05-2024"
+                    android:text=""
                     android:layout_height="wrap_content" />
 
             </LinearLayout>
@@ -61,17 +62,25 @@
             android:layout_marginEnd="5dp"
             android:src="@drawable/ic_dots" />
     </RelativeLayout>
+    <TextView
+        android:id="@+id/description_textView"
+        android:text="description"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <ImageView
         android:id="@+id/post_image"
         android:layout_width="match_parent"
-        android:src="@drawable/logo"
+        android:src="@drawable/ic_comment"
         android:visibility="visible"
-        android:layout_height="200dp" />
+        android:layout_height="wrap_content" />
+
     <VideoView
         android:id="@+id/post_video"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="wrap_content" />
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -86,6 +95,7 @@
             android:src="@drawable/ic_like" />
 
         <TextView
+            android:id="@+id/likes_textView"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -96,6 +106,7 @@
             android:textColor="@android:color/darker_gray" />
 
         <TextView
+            android:id="@+id/comments_textView"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -106,8 +117,8 @@
             android:textColor="@android:color/darker_gray" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
             android:layout_gravity="center"
             android:layout_marginEnd="5dp"
             android:src="@drawable/ic_comment"
@@ -117,10 +128,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/button_like"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

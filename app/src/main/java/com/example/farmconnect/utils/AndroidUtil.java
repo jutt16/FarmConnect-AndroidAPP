@@ -192,5 +192,9 @@ public class AndroidUtil {
         }
         return extension;
     }
-
+    public static void displayPostByUrl(Context context, String imageUrl, ImageView imageView) {
+        Glide.with(context)
+                .load(imageUrl)
+                .into(imageView);
+    }
 }

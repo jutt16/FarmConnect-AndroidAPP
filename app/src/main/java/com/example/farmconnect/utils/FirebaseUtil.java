@@ -2,6 +2,7 @@ package com.example.farmconnect.utils;
 
 import android.util.Log;
 
+import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.SearchUserActivity;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +31,16 @@ public class FirebaseUtil {
     public static DocumentReference currentUserDetails() {
         return FirebaseFirestore.getInstance().collection("users").document(currentUserId());
     }
+
+//    public static String currentUserName() {
+//        UserModel currentUserModel=null;
+//        String name=null;
+//        currentUserDetails().get().addOnCompleteListener(task -> {
+//            currentUserModel = task.getResult().toObject(UserModel.class);
+//        });
+//        name = currentUserModel.getUserName();
+//        return name;
+//    }
 
     public static CollectionReference allUserCollectionReference(){
         try {
