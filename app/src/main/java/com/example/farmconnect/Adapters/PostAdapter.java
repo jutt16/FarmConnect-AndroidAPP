@@ -1,8 +1,11 @@
 package com.example.farmconnect.Adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +28,14 @@ import com.example.farmconnect.utils.AndroidUtil;
 import com.example.farmconnect.utils.DateUtils;
 import com.example.farmconnect.utils.FirebaseUtil;
 import com.example.farmconnect.utils.PostApiCalls;
+import com.example.farmconnect.utils.UserProfileApi;
+import com.google.android.material.button.MaterialButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,50 +67,151 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = postList.get(position);
 
-        //get likes
-        PostApiCalls.getPostsLikes(context, String.valueOf(post.getId()), new PostApiCalls.PostCallback() {
+        UserProfileApi.getCurrentUserProfile(context, new UserProfileApi.UserProfileCallback() {
+            int currentUserId;
+
             @Override
             public void onSuccess(String response) {
-                // Handle successful API response
+                // Handle successful response
+                Log.d("UserProfile", "Success: " + response);
+
                 try {
-                    JSONObject responseObject = new JSONObject(response);
-                    if (responseObject.getBoolean("success")) {
-                        JSONArray postsLikeArray = responseObject.getJSONArray("posts");
-                        List<PostLikes> postLikesList = new ArrayList<>();
-                        for (int i = 0; i < postsLikeArray.length(); i++) {
-                            JSONObject postObject = postsLikeArray.getJSONObject(i);
-                            // Parse post data from JSON
-                            int id = postObject.getInt("id");
-                            int userId = postObject.getInt("user_id");
-                            // Parse other attributes similarly
-                            String userName = postObject.getString("user_name");
+                    // Parse the response JSON
+                    JSONObject jsonObject = new JSONObject(response);
+                    currentUserId = jsonObject.getInt("id");
 
-//                            if(userName.equals(FirebaseUtil.currentUserName())) {
-//                                // Set a new icon
-//                                Drawable newIcon = ContextCompat.getDrawable(context, R.drawable.baseline_thumb_up_alt_24);  // Replace with your new icon
-//                                holder.button_like.setCompoundDrawablesWithIntrinsicBounds(newIcon, null, null, null);
-//
-//                                // To reset the icon to none
-//                                holder.button_like.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-//                            }
+                    // Use the id as needed
+                    Log.d("UserProfile", "User ID: " + currentUserId);
 
-                            String userProfileImagePath = postObject.getString("user_profile_image_path");
-                            // Create Post object
-                            PostLikes postLikes = new PostLikes(id, userId, userName,userProfileImagePath);
-                            postLikesList.add(postLikes);
+                    // Now that we have the currentUserId, we can fetch the likes
+                    PostApiCalls.getPostsLikes(context, String.valueOf(post.getId()), new PostApiCalls.PostCallback() {
+                        @Override
+                        public void onSuccess(String response) {
+                            // Handle successful API response
+                            try {
+                                JSONObject responseObject = new JSONObject(response);
+                                if (responseObject.getBoolean("success")) {
+                                    JSONArray postsLikeArray = responseObject.getJSONArray("posts");
+                                    List<PostLikes> postLikesList = new ArrayList<>();
+                                    for (int i = 0; i < postsLikeArray.length(); i++) {
+                                        JSONObject postObject = postsLikeArray.getJSONObject(i);
+                                        // Parse post data from JSON
+                                        int id = postObject.getInt("id");
+                                        int userId = postObject.getInt("user_id");
+                                        if (userId == currentUserId) {
+                                            // Set a new icon
+                                            Log.d("user id",String.valueOf(userId));
+                                            Log.d("current_user id",String.valueOf(currentUserId));
+                                            holder.button_like.setIcon(context.getDrawable(R.drawable.baseline_thumb_up_alt_24));
+                                            holder.button_like.setIconTint(context.getResources().getColorStateList(R.color.red));
+                                            // To reset the icon to none
+                                            // holder.button_like.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);  // Uncomment if you want to reset the icon
+                                        }
+                                        else {
+                                            holder.button_like.setIcon(context.getDrawable(R.drawable.ic_reaction));
+                                            holder.button_like.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.darker_gray)));
+                                        }
+
+                                        String userProfileImagePath = postObject.getString("user_profile_image_path");
+                                        String userName = postObject.getString("user_name");  // You need to fetch this from the JSON if it is available
+                                        // Create Post object
+                                        PostLikes postLikes = new PostLikes(id, userId, userName, userProfileImagePath);
+                                        postLikesList.add(postLikes);
+                                    }
+                                } else {
+                                    // Handle API error or no posts found
+                                    AndroidUtil.showToast(context, "Failed to load likes!");
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    } else {
-                        // Handle API error or no posts found
-                        AndroidUtil.showToast(context,"Failed to load likes!");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.e("PostLikes", "Failed to get likes: " + e.getMessage(), e);
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("UserProfile", "Error parsing JSON: " + e.getMessage(), e);
                 }
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(IOException e) {
+                // Handle failure
+                Log.e("UserProfile", "Failure: " + e.getMessage(), e);
+            }
+        });
 
+        //like or unlike event
+        holder.button_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(holder.button_like.getIconTint().equals(context.getResources().getColorStateList(R.color.red))) {
+                    //call unlike api
+                    // Call the dislikePost method with a callback
+                    PostApiCalls.dislikePost(context, String.valueOf(post.getId()), new PostApiCalls.disLikePostCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Update UI on the main thread
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.button_like.setIcon(context.getDrawable(R.drawable.ic_reaction));
+                                    holder.button_like.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.darker_gray)));
+                                    AndroidUtil.showToast(context,"Post disliked successfully");
+                                    // Handle success
+                                    Log.d("PostApiCalls", "Post disliked successfully");
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode) {
+                            // Handle failure
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AndroidUtil.showToast(context,"Post disliked failed");
+                                }
+                            });
+                            Log.e("PostApiCalls", "Failed to dislike post: " + errorCode);
+                        }
+                    });
+                } else {
+                    //call like api
+                    // Call the likePost method with a callback
+                    PostApiCalls.likePost(context, String.valueOf(post.getId()), new PostApiCalls.LikePostCallback() {
+                        @Override
+                        public void onSuccess() {
+                            // Update UI on the main thread
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.button_like.setIcon(context.getDrawable(R.drawable.baseline_thumb_up_alt_24));
+                                    holder.button_like.setIconTint(context.getResources().getColorStateList(R.color.red));
+                                    AndroidUtil.showToast(context,"Post liked successfully");
+                                    // Handle success
+                                    Log.d("PostApiCalls", "Post liked successfully");
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(int errorCode) {
+                            // Handle failure
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    AndroidUtil.showToast(context,"Post liked failed");
+                                }
+                            });
+                            Log.e("PostApiCalls", "Failed to like post: " + errorCode);
+                        }
+                    });
+
+                }
             }
         });
 
@@ -123,7 +230,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.description_textView.setVisibility(View.GONE);
         }
         // Load user profile image using Glide
-        AndroidUtil.setProfilePicByUrl(context,context.getResources().getString(R.string.api_base_url)+":8000"+post.getUser_profile_image_path(),holder.userProfileImageView);
+        AndroidUtil.setProfilePicByUrl(context,context.getResources().getString(R.string.api_base_url)+":8000/"+post.getUser_profile_image_path(),holder.userProfileImageView);
 
         // Determine whether to display image or video
         if (post.getFile_type().equals(".mp4")) {
@@ -162,7 +269,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         VideoView postVideoView;
         TextView createdDateTextView;
         TextView likes_textView,comments_textView,description_textView;
-        Button button_like;
+        MaterialButton button_like;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

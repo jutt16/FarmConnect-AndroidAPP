@@ -173,5 +173,92 @@ public class PostApiCalls {
             }
         }.execute();
     }
+    public interface LikePostCallback {
+        void onSuccess();
+        void onFailure(int errorCode);
+    }
 
+    public static void likePost(Context context, String postId, LikePostCallback callback) {
+        OkHttpClient client = new OkHttpClient();
+
+        // Define the request body
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("post_id", postId)
+                .build();
+
+        // Create the request
+        Request request = new Request.Builder()
+                .url(context.getResources().getString(R.string.api_base_url)+":8000/api/likePost")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                .build();
+
+        // Asynchronously execute the request
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Handle the response
+                if (response.isSuccessful()) {
+                    // Request successful
+                    callback.onSuccess();
+                } else {
+                    // Request not successful
+                    callback.onFailure(response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle failure
+                e.printStackTrace();
+                Log.e("PostApiCalls", "Failed to make API call: " + e.getMessage());
+                callback.onFailure(0); // Pass an error code, or handle differently
+            }
+        });
+    }
+
+    public interface disLikePostCallback {
+        void onSuccess();
+        void onFailure(int errorCode);
+    }
+    public static void dislikePost(Context context, String postId, disLikePostCallback callback) {
+        OkHttpClient client = new OkHttpClient();
+
+        // Define the request body
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("post_id", postId)
+                .build();
+
+        // Create the request
+        Request request = new Request.Builder()
+                .url(context.getResources().getString(R.string.api_base_url)+":8000/api/dislikePost")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                .build();
+
+        // Asynchronously execute the request
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Handle the response
+                if (response.isSuccessful()) {
+                    // Request successful
+                    callback.onSuccess();
+                } else {
+                    // Request not successful
+                    callback.onFailure(response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle failure
+                e.printStackTrace();
+                Log.e("PostApiCalls", "Failed to make API call: " + e.getMessage());
+                callback.onFailure(0); // Pass an error code, or handle differently
+            }
+        });
+    }
 }

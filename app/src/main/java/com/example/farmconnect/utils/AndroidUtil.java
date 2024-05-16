@@ -165,6 +165,7 @@ public class AndroidUtil {
                 .load(imageUrl)
                 .apply(RequestOptions.circleCropTransform()) // Apply circle crop transformation
                 .into(imageView);
+        Log.d("Profile url:",imageUrl);
     }
     public static String getFileExtensionFromUri(Context context,Uri uri) {
         String extension=null;
