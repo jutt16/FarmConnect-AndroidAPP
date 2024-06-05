@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
     Button create_post_btn;
+    ImageButton search_post;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -38,12 +40,21 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         create_post_btn = view.findViewById(R.id.create_post_btn);
+        search_post = view.findViewById(R.id.search_post);
         recyclerView = view.findViewById(R.id.posts_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         postAdapter = new PostAdapter(getContext(), new ArrayList<>());
 
         // Call the API to fetch posts
         fetchPosts();
+
+        search_post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(),SearchPostActivity.class);
+                startActivity(intent);
+            }
+        });
 
         recyclerView.setAdapter(postAdapter);
 
@@ -87,8 +98,24 @@ public class HomeFragment extends Fragment {
                             Post post = new Post(id, userId, null, filePath, fileType, likes, comments, description, createdAt, userProfileImagePath, userName);
                             postList.add(post);
                         }
-                        // Update RecyclerView adapter with fetched posts
-                        postAdapter.setPosts(postList);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Update RecyclerView adapter with fetched posts
+                                postAdapter.setPosts(postList);
+                                postAdapter.notifyDataSetChanged();
+                                // Delay scroll to position 0 to allow layout process to complete
+                                recyclerView.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Scroll to the top after layout is complete
+                                        recyclerView.scrollToPosition(0);
+                                    }
+                                }, 1000);
+                            }
+                        });
+
+
                     } else {
                         // Handle API error or no posts found
                         AndroidUtil.showToast(getContext(),"Failed to load posts!");

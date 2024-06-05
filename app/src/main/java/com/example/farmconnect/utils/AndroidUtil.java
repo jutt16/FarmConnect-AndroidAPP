@@ -119,7 +119,7 @@ public class AndroidUtil {
             os.close();
             return imageFile;
         } catch (Exception e) {
-            Log.e("Bitmap To File", "Error writing bitmap to file: " + e.getMessage());
+            Log.e("Bitmap To StoryFile", "Error writing bitmap to file: " + e.getMessage());
             return null;
         }
     }

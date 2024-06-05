@@ -248,10 +248,10 @@ public class OTPVerificationActivity extends AppCompatActivity {
     }
 
     public void storeImage() {
-        // Convert Bitmap to File
+        // Convert Bitmap to StoryFile
         File imageFile = AndroidUtil.convertBitmapToFile(ImageManager.getInstance().getImageBitmap(), getApplicationContext());
 
-        // Upload File to Firebase Storage
+        // Upload StoryFile to Firebase Storage
         StorageReference imageRef = FirebaseUtil.getCurrentProfilePicStorageRef();
 
         UploadTask uploadTask = imageRef.putFile(Uri.fromFile(imageFile));
@@ -288,7 +288,7 @@ public class OTPVerificationActivity extends AppCompatActivity {
             return;
         }
 
-        // Convert the Bitmap to a File
+        // Convert the Bitmap to a StoryFile
         File imageFile = FileUtils.createImageFileFromBitmap(getApplicationContext(), bitmap);
         if (imageFile == null) {
             // Handle error: Image file creation failed

@@ -6,10 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".PostCommentActivity">
 
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/agri"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toRightOf="@+id/back_btn"
+            android:text="Comments"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/back_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/baseline_arrow_back_24"
+            app:tint="@color/white" />
+
+
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/comments_recycler_view"
         android:layout_alignBottom="@+id/bottom_layout"
         android:layout_marginBottom="80dp"
+        android:layout_marginTop="56dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -21,7 +52,7 @@
         android:id="@+id/bottom_layout">
 
         <EditText
-            android:id="@+id/chat_nessage_input"
+            android:id="@+id/comment_EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -29,14 +60,14 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_toLeftOf="@+id/message_send_btn"
+            android:layout_toLeftOf="@+id/comment_send_btn"
             android:background="@drawable/edit_text_rounded_corner"
             android:elevation="4dp"
             android:hint="Write your comment here"
             android:padding="10dp" />
 
         <ImageButton
-            android:id="@+id/message_send_btn"
+            android:id="@+id/comment_send_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentEnd="true"

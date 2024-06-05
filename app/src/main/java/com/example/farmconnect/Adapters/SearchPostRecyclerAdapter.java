@@ -3,32 +3,25 @@ package com.example.farmconnect.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
-
-import androidx.annotation.NonNull;
+        import android.widget.VideoView;
+        import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.farmconnect.Models.Post;
+        import com.bumptech.glide.Glide;
+        import com.example.farmconnect.Models.Post;
 import com.example.farmconnect.Models.PostLikes;
-import com.example.farmconnect.Models.UserModel;
 import com.example.farmconnect.PostCommentActivity;
 import com.example.farmconnect.R;
 import com.example.farmconnect.utils.AndroidUtil;
-import com.example.farmconnect.utils.DateUtils;
-import com.example.farmconnect.utils.FirebaseUtil;
 import com.example.farmconnect.utils.PostApiCalls;
 import com.example.farmconnect.utils.UserProfileApi;
 import com.google.android.material.button.MaterialButton;
@@ -38,35 +31,35 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+        import java.util.List;
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
+public class SearchPostRecyclerAdapter extends RecyclerView.Adapter<SearchPostRecyclerAdapter.SearchPostViewHolder> {
 
-    private Context context;
     private List<Post> postList;
+    private Context context;
+
+    public SearchPostRecyclerAdapter(List<Post> postList, Context context) {
+        this.postList = postList;
+        this.context = context;
+    }
 
     public void setPosts(List<Post> posts) {
         this.postList = posts;
         notifyDataSetChanged();
     }
 
-
-    public PostAdapter(Context context, List<Post> postList) {
-        this.context = context;
-        this.postList = postList;
-    }
-
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchPostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.post_layout, parent, false);
-        return new ViewHolder(view);
+        return new SearchPostRecyclerAdapter.SearchPostViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SearchPostViewHolder holder, int position) {
         Post post = postList.get(position);
 
         UserProfileApi.getCurrentUserProfile(context, new UserProfileApi.UserProfileCallback() {
@@ -109,10 +102,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                             // To reset the icon to none
                                             // holder.button_like.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);  // Uncomment if you want to reset the icon
                                         }
-//                                        else {
-//                                            holder.button_like.setIcon(context.getDrawable(R.drawable.ic_reaction));
-//                                            holder.button_like.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.darker_gray)));
-//                                        }
+                                        else {
+                                            holder.button_like.setIcon(context.getDrawable(R.drawable.ic_reaction));
+                                            holder.button_like.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.darker_gray)));
+                                        }
 
                                         String userProfileImagePath = postObject.getString("user_profile_image_path");
                                         String userName = postObject.getString("user_name");  // You need to fetch this from the JSON if it is available
@@ -229,9 +222,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         // Bind data to views
         holder.userNameTextView.setText(post.getUser_name());
-//        Log.d("post time:",DateUtils.parseDate(post.getCreated_at().toString()).toString());
         holder.postTimeTextView.setText(post.getCreated_at().toString());
-//        holder.createdDateTextView.setText("created at "+post.getCreated_at().toString());
+        holder.createdDateTextView.setText("created at "+post.getCreated_at().toString());
         holder.likes_textView.setText(post.getLikes()+" likes");
         holder.comments_textView.setText(post.getComments()+" comments");
 //        Log.d("Description",post.getDiscription().toString());
@@ -243,7 +235,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.description_textView.setVisibility(View.GONE);
         }
         // Load user profile image using Glide
-        AndroidUtil.setProfilePicByUrl(context,context.getResources().getString(R.string.api_base_url)+":8000"+post.getUser_profile_image_path(),holder.userProfileImageView);
+        AndroidUtil.setProfilePicByUrl(context,context.getResources().getString(R.string.api_base_url)+":8000/"+post.getUser_profile_image_path(),holder.userProfileImageView);
 
         // Determine whether to display image or video
         if (post.getFile_type().equals(".mp4")) {
@@ -273,27 +265,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return postList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        // Define views from post_layout.xml
+    public static class SearchPostViewHolder extends RecyclerView.ViewHolder {
         ImageView userProfileImageView;
         TextView userNameTextView;
         TextView postTimeTextView;
         ImageView postImageView;
         VideoView postVideoView;
-//        TextView createdDateTextView;
+        TextView createdDateTextView;
         TextView likes_textView,comments_textView,description_textView;
         MaterialButton button_like,button_comment;
-
-        public ViewHolder(@NonNull View itemView) {
+        public SearchPostViewHolder(@NonNull View itemView) {
             super(itemView);
-
             // Initialize views
             userProfileImageView = itemView.findViewById(R.id.poster_profile_pic);
             userNameTextView = itemView.findViewById(R.id.poster_username_textView);
             postTimeTextView = itemView.findViewById(R.id.posting_time_textView);
             postImageView = itemView.findViewById(R.id.post_image);
             postVideoView = itemView.findViewById(R.id.post_video);
-//            createdDateTextView = itemView.findViewById(R.id.posting_time_textView);
+            createdDateTextView = itemView.findViewById(R.id.posting_time_textView);
             likes_textView = itemView.findViewById(R.id.likes_textView);
             comments_textView = itemView.findViewById(R.id.comments_textView);
             description_textView = itemView.findViewById(R.id.description_textView);

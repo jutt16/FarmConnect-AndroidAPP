@@ -58,7 +58,7 @@ public class UserProfileApi {
 
     public static void updateProfilePic(Context context, Uri imageUri, UpdateProfilePicCallback callback) {
         try {
-            // Convert URI to File
+            // Convert URI to StoryFile
             File file = uriToFile(context, imageUri);
             if (file == null) {
                 callback.onFailure(new IOException("Failed to create file from URI"));

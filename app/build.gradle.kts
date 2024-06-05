@@ -54,4 +54,7 @@ dependencies {
     implementation ("com.github.dhaval2404:imagepicker:2.1")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation ("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
+
+    //for image slide
+    implementation ("com.github.denzcoskun:ImageSlideshow:0.1.2")
 }

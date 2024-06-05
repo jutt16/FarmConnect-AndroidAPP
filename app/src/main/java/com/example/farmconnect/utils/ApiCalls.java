@@ -277,9 +277,11 @@ public class ApiCalls {
             String mobile = friendObject.getString("mobile");
             Object address = friendObject.isNull("address") ? null : friendObject.get("address");
             String profileImagePath = friendObject.getString("profile_image_path");
-
+//            profileImagePath = "/"+profileImagePath;
+            Log.d("profile image of friend path",profileImagePath);
             FriendsModel friend = new FriendsModel(userId, name, mobile, address, profileImagePath);
 
+            
             friendsList.add(friend);
         }
 
@@ -329,6 +331,50 @@ public class ApiCalls {
 
     public interface unFriendRequestCallback {
         void onResult(boolean success);
+    }
+
+    public static void fetchFriendsofFriend(RecyclerView recyclerView,String id, Context context) {
+        new AsyncTask<Void, Void, ArrayList<FriendsModel>>() {
+            @Override
+            protected ArrayList<FriendsModel> doInBackground(Void... voids) {
+                OkHttpClient client = new OkHttpClient();
+
+                try {
+                    Request request = new Request.Builder()
+                            .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/getFriendsByID?id="+id)
+                            .method("GET", null)
+                            .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                            .build();
+
+                    Response response = client.newCall(request).execute();
+
+                    // Check if the response is successful (status code 200)
+                    if (response.isSuccessful()) {
+                        String responseData = response.body().string();
+                        return parseFriends(responseData);
+                    } else {
+                        // Handle error response (e.g., display error message)
+                        Log.e("fetchRequests", "Server returned error response: " + response.code());
+                        return null;
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                    Log.d("Fetch Request Error",e.getMessage());
+                    return null; // Return null to indicate error
+                }
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<FriendsModel> requestsList) {
+                if (requestsList != null) {
+                    FriendRecyclerAdapter adapter = new FriendRecyclerAdapter(requestsList,context);
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    // Handle error or show error message
+                    AndroidUtil.showToast(context, "Failed to fetch friend requests!");
+                }
+            }
+        }.execute();
     }
 
 }

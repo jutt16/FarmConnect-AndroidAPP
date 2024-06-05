@@ -26,6 +26,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".AdsReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SellProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".StoryViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateStoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchPostActivity"
+            android:exported="false" />
+        <activity
             android:name=".PostCommentActivity"
             android:exported="false" />
         <activity

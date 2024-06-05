@@ -7,6 +7,10 @@ import android.util.Log;
 
 import com.example.farmconnect.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -204,6 +208,7 @@ public class PostApiCalls {
                     callback.onSuccess();
                 } else {
                     // Request not successful
+                    Log.d("Like Failed",response.toString());
                     callback.onFailure(response.code());
                 }
             }
@@ -260,5 +265,193 @@ public class PostApiCalls {
                 callback.onFailure(0); // Pass an error code, or handle differently
             }
         });
+    }
+
+    public interface GetPostCommentsCallback {
+        void onSuccess(JSONArray comments);
+        void onFailure(Exception e);
+    }
+
+    public static void getPostComments(Context context, String postId, GetPostCommentsCallback callback) {
+        OkHttpClient client = new OkHttpClient();
+
+        // Define the request body (if needed)
+//        RequestBody body = RequestBody.create(MediaType.parse("application/json"), "{\"post_id\": " + postId + "}");
+
+        // Create the request
+        Request request = new Request.Builder()
+                .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/postComments?post_id="+postId)
+                .method("GET", null)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                .build();
+
+        // Asynchronously execute the request
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Handle the response
+                if (response.isSuccessful()) {
+                    try {
+                        // Parse the response JSON
+                        JSONObject jsonResponse = new JSONObject(response.body().string());
+                        JSONArray comments = jsonResponse.getJSONArray("posts");
+
+                        // Invoke the callback with comments
+                        callback.onSuccess(comments);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        callback.onFailure(e);
+                    }
+                } else {
+                    // Request not successful
+                    callback.onFailure(new IOException("Failed to get post comments: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle failure
+                e.printStackTrace();
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public interface CommentOnPostCallback {
+        void onSuccess();
+        void onFailure(Exception e);
+    }
+
+    public static void commentOnPost(Context context, String postId, String commentText, CommentOnPostCallback callback) {
+        OkHttpClient client = new OkHttpClient();
+
+        // Define the request body
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("post_id", postId)
+                .addFormDataPart("comment", "\""+commentText+"\"")
+                .build();
+
+        Log.d("Comment",commentText);
+
+        // Create the request
+        Request request = new Request.Builder()
+                .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/commentPost")
+                .method("POST", body)
+                .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                .build();
+
+        Log.d("URL",context.getResources().getString(R.string.api_base_url) + ":8000/api/commentPost");
+        Log.d("post_id",postId);
+        Log.d("token",TokenManager.getToken(context));
+
+        // Asynchronously execute the request
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // Handle the response
+                if (response.isSuccessful()) {
+                    callback.onSuccess();
+                } else {
+                    callback.onFailure(new Exception("Failed to comment on post: " + response.code()));
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // Handle failure
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    public interface SearchPostCallback {
+        void onSuccess(String response);
+        void onFailure(Exception e);
+    }
+
+    public static void searchPost(Context context, String description, SearchPostCallback callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+                    // Build the request
+                    Request request = new Request.Builder()
+                            .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/searchPosts?discription="+description)
+                            .method("GET", null)
+                            .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                            .build();
+
+                    // Execute the request
+                    Response response = client.newCall(request).execute();
+
+                    if (response.isSuccessful()) {
+                        return response.body().string();
+                    } else {
+                        throw new IOException("Unsuccessful response: " + response.code());
+                    }
+                } catch (IOException e) {
+                    // Handle failure
+                    Log.e("Error", "Failed to make request: " + e.getMessage());
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String responseBody) {
+                if (responseBody != null) {
+                    callback.onSuccess(responseBody);
+                } else {
+                    // Handle unsuccessful response
+                    Log.e("Error", "Response body is null");
+                    callback.onFailure(new IOException("Response body is null"));
+                }
+            }
+        }.execute();
+    }
+    // New method for fetching current users posts
+    public static void getCurrentUsersPosts(Context context, String id, final PostCallback callback) {
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... voids) {
+                try {
+                    OkHttpClient client = new OkHttpClient().newBuilder().build();
+
+                    // Build the request
+                    Request request = new Request.Builder()
+                            .url(context.getResources().getString(R.string.api_base_url) + ":8000/api/getUsersPosts?id="+id)
+                            .method("GET", null)
+                            .addHeader("Authorization", "Bearer " + TokenManager.getToken(context))
+                            .build();
+
+                    // Execute the request
+                    Response response = client.newCall(request).execute();
+
+                    if (response.isSuccessful()) {
+                        return response.body().string();
+                    } else {
+                        throw new IOException("Unsuccessful response: " + response.code());
+                    }
+                } catch (IOException e) {
+                    // Handle failure
+                    Log.e("Error", "Failed to make request: " + e.getMessage());
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String responseBody) {
+                if (responseBody != null) {
+                    callback.onSuccess(responseBody);
+                } else {
+                    // Handle unsuccessful response
+                    Log.e("Error", "Response body is null");
+                    callback.onFailure(new IOException("Response body is null"));
+                }
+            }
+        }.execute();
     }
 }
